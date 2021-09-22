@@ -1,0 +1,50 @@
+---
+title: "README"
+author: "Lexi Luo"
+date: "9/22/2021"
+output: github_document
+---
+### https://github.com/QLexiLuo/STAT433-HW1
+
+```{r}
+library(data.table)
+x = fread("https://www.fhwa.dot.gov/bridge/nbi/2020/delimited/IL20.txt")
+str(x)
+#Bridges in Illinois based on county code
+library(ggplot2)
+ggplot(data = x, aes(x$COUNTY_CODE_003)) +
+  geom_histogram(color = "black", fill = "white") +
+  theme(axis.title.x = element_text(color = "#993332")) +
+  theme(axis.title.y = element_text(color = "#993332")) +
+  xlab("County Code") +
+  ggtitle("Bridges based on county code in IL") 
+```
+
+
+```{r}
+#Bridges in Illinois Based on Owners
+library(dplyr)
+Ownership = x %>% group_by(OWNER_022) %>% summarise(n = n())
+Ownership$OWNER_022 <- c("State Highway Agency", "County Highway Agency", "Town or Township Highway Agency", 
+                         "City or Municipal Highway Agency" , "State Park, Forest, or Reservation Agency", 
+                         "Local Park, Forest, or Reservation Agency", "Other State Agencies", "Other Local Agencies",
+                         "Private (other than railroad)", "Railroad", "State Toll Authority", "Bureau of Fish and Wildlife",
+                         "U.S. Forest Service", "Corps of Engineers (Civil)", "Air Force", "Navy/Marines", "Army")
+
+as.numeric(Ownership$n)
+newdata <- Ownership[order(Ownership$n),]
+Group1 <- newdata %>%
+  slice(1:12)
+Group2 <- newdata %>%
+  slice(13:17)
+
+ggplot(data=Group1, aes(x=OWNER_022, y=n)) + 
+  geom_bar(stat = "identity") +
+  xlab("Owner") +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+
+ggplot(data=Group2, aes(x=OWNER_022, y=n)) + 
+  geom_bar(stat = "identity") +
+  xlab("Owner") +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+```
